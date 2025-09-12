@@ -1,0 +1,131 @@
+openapi: 3.1.0
+info:
+  title: CFDI ERP API
+  version: 0.1.0
+  description: API para ERP + generación/gestión de CFDI
+servers:
+  - url: http://localhost:8000
+paths:
+  /health:
+    get:
+      summary: Liveness
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /invoices:
+    post:
+      summary: Recibe datos desde ERP y crea factura (pendiente de timbrado)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceIn'
+      responses:
+        '202':
+          description: Aceptado y encolado para timbrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceOut'
+  /invoices/{id}:
+    get:
+      summary: Consulta estado de factura
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Estado actual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceOut'
+  /invoices/{uuid}/cancel:
+    post:
+      summary: Solicita cancelación
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelIn'
+      responses:
+        '202':
+          description: Cancelación en proceso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelOut'
+components:
+  schemas:
+    Party:
+      type: object
+      properties:
+        rfc: { type: string }
+        nombre: { type: string }
+        regimenFiscal: { type: string }
+        domicilioFiscalReceptor: { type: string }
+        usoCFDI: { type: string }
+    Concepto:
+      type: object
+      properties:
+        claveProdServ: { type: string }
+        noIdentificacion: { type: string }
+        cantidad: { type: number }
+        claveUnidad: { type: string }
+        unidad: { type: string }
+        descripcion: { type: string }
+        valorUnitario: { type: number }
+        descuento: { type: number }
+    InvoiceIn:
+      type: object
+      properties:
+        serie: { type: string }
+        folio: { type: string }
+        fecha: { type: string, format: date-time }
+        moneda: { type: string }
+        tipoCambio: { type: number }
+        formaPago: { type: string }
+        metodoPago: { type: string }
+        lugarExpedicion: { type: string }
+        emisor: { $ref: '#/components/schemas/Party' }
+        receptor: { $ref: '#/components/schemas/Party' }
+        conceptos:
+          type: array
+          items: { $ref: '#/components/schemas/Concepto' }
+    InvoiceOut:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [pending, validating, stamped, cancelled, failed] }
+        uuid: { type: string, nullable: true }
+        xml_url: { type: string, nullable: true }
+        errors:
+          type: array
+          items: { type: string }
+    CancelIn:
+      type: object
+      properties:
+        motivo: { type: string, enum: ["01", "02", "03", "04"] }
+        uuidSustituto: { type: string, nullable: true }
+    CancelOut:
+      type: object
+      properties:
+        uuid: { type: string }
+        status: { type: string, enum: [cancel_pending, cancel_accepted, cancel_rejected] }

@@ -1,0 +1,53 @@
+{
+  "info": {
+    "name": "CFDI-ERP-Starter",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Invoice",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/invoices",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "invoices"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"serie\": \"A\", \"folio\": \"12345\", \"fecha\": \"2025-09-12T14:05:00-06:00\", \"moneda\": \"MXN\", \"tipoCambio\": 1, \"formaPago\": \"03\", \"metodoPago\": \"PUE\", \"lugarExpedicion\": \"72000\", \"emisor\": {\"rfc\": \"AAA010101AAA\", \"nombre\": \"MI EMPRESA SA de CV\", \"regimenFiscal\": \"601\"}, \"receptor\": {\"rfc\": \"BBB010101BBB\", \"nombre\": \"CLIENTE SA\", \"domicilioFiscalReceptor\": \"03100\", \"regimenFiscalReceptor\": \"601\", \"usoCFDI\": \"G03\"}, \"conceptos\": [{\"claveProdServ\": \"01010101\", \"noIdentificacion\": \"SKU-001\", \"cantidad\": 1, \"claveUnidad\": \"H87\", \"unidad\": \"Pieza\", \"descripcion\": \"Servicio\", \"valorUnitario\": 1000, \"descuento\": 0}]}"
+        }
+      }
+    }
+  ]
+}

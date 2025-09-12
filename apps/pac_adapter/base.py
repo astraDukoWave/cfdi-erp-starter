@@ -1,0 +1,9 @@
+from abc import ABC, abstractmethod
+
+class PACClient(ABC):
+    @abstractmethod
+    def stamp(self, xml: bytes) -> dict: ...
+    @abstractmethod
+    def cancel(self, uuid: str, motivo: str, sustituto: str | None) -> dict: ...
+    @abstractmethod
+    def query(self, uuid: str) -> dict: ...
